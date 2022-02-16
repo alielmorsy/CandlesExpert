@@ -1,0 +1,60 @@
+{
+  "format": 1,
+  "restore": {
+    "D:\\works\\c#\\CandlesChart\\CandlesChart\\CandlesChart.csproj": {}
+  },
+  "projects": {
+    "D:\\works\\c#\\CandlesChart\\CandlesChart\\CandlesChart.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\works\\c#\\CandlesChart\\CandlesChart\\CandlesChart.csproj",
+        "projectName": "CandlesChart",
+        "projectPath": "D:\\works\\c#\\CandlesChart\\CandlesChart\\CandlesChart.csproj",
+        "packagesPath": "C:\\Users\\Ali Elmorsy\\.nuget\\packages\\",
+        "outputPath": "D:\\works\\c#\\CandlesChart\\CandlesChart\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\Ali Elmorsy\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.101\\RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
