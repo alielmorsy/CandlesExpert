@@ -52,6 +52,7 @@ public class CandleService : ICandleService
 
                 if (Math.Round(mainCandle.OpenPrice) == Math.Round(childCandle.OpenPrice))
                 {
+                    newLine.Candles.Add(childCandle);
                     Console.WriteLine("\t\t Match On Open Price, Candle: " + childCandle);
                     if (mainCandle.CandleType == CandleType.HighCandle &&
                         childCandle.CandleType == CandleType.HighCandle)
@@ -60,7 +61,6 @@ public class CandleService : ICandleService
                         if (newLine.IsBroken) newLine.BrokenCount++;
                         newLine.LineType = LineType.SupportLine;
                         newLine.Price = mainCandle.OpenPrice;
-                        newLine.Candles.Add(childCandle);
                     }
                     else if (mainCandle.CandleType == CandleType.LowCandle &&
                              childCandle.CandleType == CandleType.LowCandle)
@@ -69,11 +69,11 @@ public class CandleService : ICandleService
                         newLine.LineType = LineType.SupportResistance;
                         if (newLine.IsBroken) newLine.BrokenCount++;
                         newLine.Price = mainCandle.OpenPrice;
-                        newLine.Candles.Add(childCandle);
                     }
                 }
                 else if (Math.Round(mainCandle.OpenPrice) == Math.Round(childCandle.ClosePrice))
                 {
+                    newLine.Candles.Add(childCandle);
                     Console.WriteLine("\t\t Match On open in main and open in close, Candle: " + childCandle);
                     if (mainCandle.CandleType == CandleType.HighCandle &&
                         childCandle.CandleType == CandleType.LowCandle)
@@ -81,12 +81,13 @@ public class CandleService : ICandleService
                         newLine.IsBroken = newLine.LineType != null && newLine.LineType != LineType.SupportLine;
                         newLine.LineType = LineType.SupportLine;
                         newLine.Price = mainCandle.OpenPrice;
-                        newLine.Candles.Add(childCandle);
+
                         if (newLine.IsBroken) newLine.BrokenCount++;
                     }
                 }
                 else if (Math.Round(mainCandle.ClosePrice) == Math.Round(childCandle.OpenPrice))
                 {
+                    newLine.Candles.Add(childCandle);
                     Console.WriteLine("\t\t Match On Close in main and open in child, Candle: " + childCandle);
                     if (mainCandle.CandleType == CandleType.LowCandle &&
                         childCandle.CandleType == CandleType.HighCandle)
@@ -94,12 +95,13 @@ public class CandleService : ICandleService
                         newLine.IsBroken = newLine.LineType != null && newLine.LineType != LineType.SupportLine;
                         newLine.LineType = LineType.SupportLine;
                         newLine.Price = mainCandle.ClosePrice;
-                        newLine.Candles.Add(childCandle);
+
                         if (newLine.IsBroken) newLine.BrokenCount++;
                     }
                 }
                 else if (Math.Round(mainCandle.ClosePrice) == Math.Round(childCandle.ClosePrice))
                 {
+                    newLine.Candles.Add(childCandle);
                     Console.WriteLine("\t\t Match On Close Price, Candle: " + childCandle);
                     if (mainCandle.CandleType == CandleType.HighCandle &&
                         childCandle.CandleType == CandleType.LowCandle)
@@ -107,7 +109,7 @@ public class CandleService : ICandleService
                         newLine.IsBroken = newLine.LineType != null && newLine.LineType != LineType.SupportLine;
                         newLine.LineType = LineType.SupportLine;
                         newLine.Price = mainCandle.ClosePrice;
-                        newLine.Candles.Add(childCandle);
+
                         if (newLine.IsBroken) newLine.BrokenCount++;
                     }
                     else if (mainCandle.CandleType == CandleType.HighCandle &&
@@ -116,7 +118,7 @@ public class CandleService : ICandleService
                         newLine.IsBroken = newLine.LineType != null && newLine.LineType != LineType.SupportResistance;
                         newLine.LineType = LineType.SupportResistance;
                         newLine.Price = mainCandle.ClosePrice;
-                        newLine.Candles.Add(childCandle);
+                   
                         if (newLine.IsBroken) newLine.BrokenCount++;
                     }
                 }
