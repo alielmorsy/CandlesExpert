@@ -12,10 +12,9 @@ using CandlesChart.services;
     HttpResponseMessage response =
         await client.GetAsync("https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=4h");
     var result = await response.Content.ReadAsStringAsync();
+    //var result = await File.ReadAllTextAsync("json");
 
     var service = new CandleService();
     service.CreateCandlesFromOldData(result);
     service.CreateLines();
-    
-    
 }

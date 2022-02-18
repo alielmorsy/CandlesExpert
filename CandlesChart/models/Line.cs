@@ -2,7 +2,7 @@
 
 public class Line
 {
-    public float? Price { get; set; }
+    public float Price { get; set; } = 0;
 
     public List<Candle> Candles { get; } = new();
 
@@ -12,7 +12,11 @@ public class Line
 
     public int BrokenCount { get; set; } = 0;
 
-    public float HighestPrice { get; set; }
+    public List<BreakData> BreakDataList { get; } = new();
 
-    public float LowestPrice { get; set; }
+    public override string ToString()
+    {
+        return
+            $"Price: {Price}, Number Of Candles On It: {Candles.Count}, Line Type: {LineType}, Number Of Breaks :{BreakDataList.Count}";
+    }
 }
