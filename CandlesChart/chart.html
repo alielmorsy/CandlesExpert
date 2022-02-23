@@ -1,0 +1,61 @@
+<html>
+<head>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+        google.charts.load('current', {'packages': ['corechart', 'controls']});
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+            var dataTable = new google.visualization.DataTable();
+            dataTable.addColumn('datetime', 'Date');
+            dataTable.addColumn('number', 'Low');
+            dataTable.addColumn('number', 'Close');
+            dataTable.addColumn('number', 'Open');
+            dataTable.addColumn('number', 'High');
+
+
+            var options = {
+                legend: 'none',
+                vAxis: {logscale: true},
+                explorer: {axis: 'horizontal'},
+                chartArea: {width: "90%", height: "80%"}
+
+            };
+
+            var chart = new google.visualization.CandlestickChart(document.getElementById('chart_div'));
+            //  chart.bind(programmaticChart);    
+
+            fetch("candles.json")
+                .then(data => data.json())
+                .then(data => {
+                    let candles = data['candles'];
+                    let numberOfLines = data["lines"];
+                    var series = {};
+                    for (var i = 1; i <= numberOfLines; i++) {
+                        dataTable.addColumn("number", "Line " + i);
+                        series[i] = {type: 'line'}
+                    }
+                    options['series'] = series;
+                    candles.map(c => {
+                        c[0] = new Date(c[0]);
+                        dataTable.addRow(c);
+                    });
+
+
+                    chart.draw(dataTable, options);
+                })
+            // Don't fucking replace columns order pls <3
+
+
+        }
+    </script>
+</head>
+<body>
+<div id="dashboard_div">
+    <!--Divs that will hold each control and chart-->
+    <div id="filter_div"></div>
+    <div id="chart_div" style="width: 100%; height: 100%;"></div>
+</div>
+
+</body>
+</html>

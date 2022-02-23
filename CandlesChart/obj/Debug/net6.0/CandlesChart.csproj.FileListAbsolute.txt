@@ -17,7 +17,6 @@ D:\works\c#\CandlesChart\CandlesChart\bin\Debug\net6.0\CandlesChart.exe
 D:\works\c#\CandlesChart\CandlesChart\bin\Debug\net6.0\CandlesChart.deps.json
 D:\works\c#\CandlesChart\CandlesChart\bin\Debug\net6.0\CandlesChart.runtimeconfig.json
 D:\works\c#\CandlesChart\CandlesChart\bin\Debug\net6.0\CandlesChart.dll
-D:\works\c#\CandlesChart\CandlesChart\bin\Debug\net6.0\ref\CandlesChart.dll
 D:\works\c#\CandlesChart\CandlesChart\bin\Debug\net6.0\CandlesChart.pdb
 D:\works\c#\CandlesChart\CandlesChart\obj\Debug\net6.0\CandlesChart.csproj.AssemblyReference.cache
 D:\works\c#\CandlesChart\CandlesChart\obj\Debug\net6.0\CandlesChart.GeneratedMSBuildEditorConfig.editorconfig
@@ -28,3 +27,4 @@ D:\works\c#\CandlesChart\CandlesChart\obj\Debug\net6.0\CandlesChart.dll
 D:\works\c#\CandlesChart\CandlesChart\obj\Debug\net6.0\ref\CandlesChart.dll
 D:\works\c#\CandlesChart\CandlesChart\obj\Debug\net6.0\CandlesChart.pdb
 D:\works\c#\CandlesChart\CandlesChart\obj\Debug\net6.0\CandlesChart.genruntimeconfig.cache
+D:\works\c#\CandlesChart\CandlesChart\obj\Debug\net6.0\refint\CandlesChart.dll

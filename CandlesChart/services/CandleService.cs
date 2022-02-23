@@ -263,6 +263,7 @@ public class CandleService : ICandleService
         }
 
         CalculatePricesBetweenLineBreak();
+        FilterDoubleLines();
     }
 
     public Candle? CreateCandleBasedOnNewData(string json)
@@ -342,5 +343,67 @@ public class CandleService : ICandleService
                 }
             }
         }
+    }
+     private void FilterDoubleLines()
+    {
+        var lines = new HashSet<Line>();
+        Console.WriteLine(_lines.Count);
+        for (int i = 0; i < _lines.Count; i++)
+        {
+            var line = _lines[i];
+            for (int j = i + 1; j < _lines.Count; j++)
+            {
+                bool shouldBreak = false;
+                var childLine = _lines[j];
+
+
+                if (Math.Abs(line.Price - childLine.Price) > 150)
+
+                    continue;
+
+                switch (line.LineType)
+                {
+                    case LineType.SupportLine when childLine.LineType == LineType.SupportLine:
+                    case LineType.SupportResistance when childLine.LineType == LineType.SupportResistance:
+                        Console.WriteLine("IN");
+                        if (line.Price < childLine.Price)
+                        {
+                            _lines.RemoveAt(j);
+                            foreach (var childCandle in childLine.Candles)
+                            {
+                                var alreadyAdded = line.Candles.Any(c => c == childCandle);
+                                if (alreadyAdded)
+                                {
+                                    line.Candles.Add(childCandle);
+                                }
+                            }
+
+                            line.BreakDataList.AddRange(childLine.BreakDataList);
+                            lines.Add(line);
+                        }
+                        else if (line.Price > childLine.Price)
+                        {
+                            _lines.RemoveAt(i);
+                            foreach (var childCandle in line.Candles)
+                            {
+                                var alreadyAdded = childLine.Candles.Any(c => c == childCandle);
+                                if (alreadyAdded)
+                                {
+                                    childLine.Candles.Add(childCandle);
+                                }
+                            }
+
+                            lines.Add(childLine);
+                            shouldBreak = true;
+                        }
+
+                        break;
+                }
+
+                if (shouldBreak) break;
+            }
+        }
+
+        _lines = lines.ToList();
     }
 }

@@ -6,7 +6,7 @@ using CandlesChart.models;
 using CandlesChart.services;
 
 
-//Get the data
+//Get the data  
 {
     var client = new HttpClient(new HttpClientHandler());
     HttpResponseMessage response =
@@ -17,4 +17,12 @@ using CandlesChart.services;
     var service = new CandleService();
     service.CreateCandlesFromOldData(result);
     service.CreateLines();
+
+    new WriteDataToStream(new FileStream("../../../candles.json", FileMode.Truncate, FileAccess.Write), service.Candles,
+        service.Lines).WriteData();
+    var i = 1;
+    foreach (var line in service.Lines)
+    {
+        Console.WriteLine($"Line {i++}: {line}");
+    }
 }
