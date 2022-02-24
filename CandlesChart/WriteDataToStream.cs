@@ -6,11 +6,11 @@ namespace CandlesChart;
 
 public class WriteDataToStream
 {
-    private List<Candle> _candles;
+    private readonly List<Candle> _candles;
 
-    private List<Line> _lines;
+    private readonly List<Line> _lines;
 
-    private Stream _stream;
+    private readonly Stream _stream;
 
     public WriteDataToStream(Stream stream, List<Candle> candles, List<Line> lines)
     {
@@ -22,7 +22,7 @@ public class WriteDataToStream
     public bool WriteData()
     {
         List<List<object>> data = new List<List<object>>();
-        for (int m = 0; m < 100; m++)
+        for (int m = 0; m < _candles.Count; m++)
         {
             Candle candle = _candles[m];
             List<object> l = new List<object>();

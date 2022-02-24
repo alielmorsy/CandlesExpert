@@ -48,14 +48,47 @@ public class CandleService : ICandleService
 
             var points = new BreakData() { };
             var m = 0;
+            bool shouldAdd = true;
             for (var j = i + 1; j < count; j++)
             {
+                if (newLine != null && shouldAdd && newLine.Price != 0)
+                {
+                    var tmpLines = _lines.Where(l =>
+                            Math.Abs(Math.Round(l.Price) - Math.Abs(newLine.Price)) < 120 &&
+                            l.LineType == newLine.LineType)
+                        .ToList();
+                    switch (tmpLines.Count)
+                    {
+                        case 0:
+                            break;
+                        case 1:
+                            
+                            shouldAdd = false;
+                            newLine = tmpLines[0];
+                            break;
+                        default:
+                            Console.WriteLine("Btl :"+tmpLines.Count);
+                            shouldAdd = false;
+                            newLine = tmpLines.MinBy(l => l.Price);
+                            foreach (var tmpLine in tmpLines)
+                            {
+                                if (tmpLine == newLine) continue;
+    
+                                newLine?.Candles.AddRange(tmpLine.Candles);
+                                
+                                _lines.RemoveAt(_lines.IndexOf(tmpLine));
+                            }
+
+                            break;
+                    }
+                }
+
                 m++;
                 var childCandle = candles[j];
 
                 if (Math.Round(mainCandle.OpenPrice) == Math.Round(childCandle.OpenPrice))
                 {
-                    newLine.Candles.Add(childCandle);
+                    newLine?.Candles.Add(childCandle);
 
                     switch (mainCandle.CandleType)
                     {
@@ -241,10 +274,14 @@ public class CandleService : ICandleService
                 }
             }
 
+            if (!shouldAdd)
+                continue;
+
             if (newLine.Price == 0) continue;
             if (_lines.Count != 0)
             {
-                var oldLine = _lines.SingleOrDefault(o => Math.Round(newLine.Price) == Math.Round(o.Price));
+                var oldLine =
+                    _lines.SingleOrDefault(o => Math.Abs(Math.Round(newLine.Price) - Math.Round(o.Price)) < 120 && newLine.LineType==o.LineType);
 
 
                 if (oldLine == null)
@@ -263,7 +300,7 @@ public class CandleService : ICandleService
         }
 
         CalculatePricesBetweenLineBreak();
-        FilterDoubleLines();
+       // FilterDoubleLines();
     }
 
     public Candle? CreateCandleBasedOnNewData(string json)
@@ -344,7 +381,8 @@ public class CandleService : ICandleService
             }
         }
     }
-     private void FilterDoubleLines()
+
+    private void FilterDoubleLines()
     {
         var lines = new HashSet<Line>();
         Console.WriteLine(_lines.Count);
