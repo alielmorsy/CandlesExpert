@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using CandlesChart.models;
+using CandlesChart.models.enums;
 using CandlesChart.services.interfaces;
 
 namespace CandlesChart.services;
@@ -13,26 +14,23 @@ public class CandleService : ICandleService
         return _instance ??= new CandleService();
     }
 
-    private List<Candle> _candles = new();
-    private List<Line> _lines = new();
+    public List<Candle> Candles { get; private set; } = new();
 
-    public List<Candle> Candles => _candles;
-
-    public List<Line> Lines => _lines;
+    public List<Line> Lines { get; private set; } = new();
 
     public void CreateCandlesFromOldData(string candlesJson)
     {
         var candlesList = JsonSerializer.Deserialize<List<List<object>>>(candlesJson);
-        _candles = new List<Candle>();
+        Candles = new List<Candle>();
         foreach (var candle in candlesList)
         {
-            _candles.Add(ListToCandle(candle));
+            Candles.Add(ListToCandle(candle));
         }
     }
 
-    public void CreateLines()
+    public void Analyse()
     {
-        var candles = _candles;
+        var candles = Candles;
         var lastCandle = candles[^1];
         var count = candles.Count;
         if (lastCandle.EndTime < DateTime.Now.Millisecond)
@@ -48,13 +46,13 @@ public class CandleService : ICandleService
 
             var points = new BreakData() { };
             var m = 0;
-            bool shouldAdd = true;
+            var shouldAdd = true;
             for (var j = i + 1; j < count; j++)
             {
                 if (newLine != null && shouldAdd && newLine.Price != 0)
                 {
-                    var tmpLines = _lines.Where(l =>
-                            Math.Abs(Math.Round(l.Price) - Math.Abs(newLine.Price)) < 120 &&
+                    var tmpLines = Lines.Where(l =>
+                            Math.Abs(Math.Round(l.Price) - Math.Abs(newLine.Price)) < 150 &&
                             l.LineType == newLine.LineType)
                         .ToList();
                     switch (tmpLines.Count)
@@ -62,21 +60,19 @@ public class CandleService : ICandleService
                         case 0:
                             break;
                         case 1:
-                            
+
                             shouldAdd = false;
                             newLine = tmpLines[0];
                             break;
                         default:
-                            Console.WriteLine("Btl :"+tmpLines.Count);
                             shouldAdd = false;
                             newLine = tmpLines.MinBy(l => l.Price);
-                            foreach (var tmpLine in tmpLines)
+                            foreach (var tmpLine in tmpLines.Where(tmpLine => tmpLine != newLine))
                             {
-                                if (tmpLine == newLine) continue;
-    
+                                //Can't Add Old Breaks Of All Lines Bcz it will leak of data
                                 newLine?.Candles.AddRange(tmpLine.Candles);
                                 
-                                _lines.RemoveAt(_lines.IndexOf(tmpLine));
+                                Lines.RemoveAt(Lines.IndexOf(tmpLine));
                             }
 
                             break;
@@ -86,7 +82,7 @@ public class CandleService : ICandleService
                 m++;
                 var childCandle = candles[j];
 
-                if (Math.Round(mainCandle.OpenPrice) == Math.Round(childCandle.OpenPrice))
+                if (Math.Abs(Math.Round(mainCandle.OpenPrice) - Math.Round(childCandle.OpenPrice)) < 100)
                 {
                     newLine?.Candles.Add(childCandle);
 
@@ -97,7 +93,6 @@ public class CandleService : ICandleService
                             newLine.IsBroken = newLine.LineType != null && newLine.LineType != LineType.SupportLine;
                             if (newLine.IsBroken)
                             {
-                                Console.WriteLine("Weird State");
                                 newLine.BrokenCount++;
                                 points.CurrentLineType = newLine.LineType;
                                 points.NumberOfCandles = m - 1;
@@ -107,7 +102,8 @@ public class CandleService : ICandleService
                             }
 
                             newLine.LineType = LineType.SupportLine;
-                            newLine.Price = mainCandle.OpenPrice;
+                            if (shouldAdd)
+                                newLine.Price = mainCandle.OpenPrice;
                             break;
                         }
                         case CandleType.LowCandle when childCandle.CandleType == CandleType.LowCandle:
@@ -116,7 +112,7 @@ public class CandleService : ICandleService
                                                newLine.LineType != LineType.SupportResistance;
                             if (newLine.IsBroken)
                             {
-                                Console.WriteLine("Weird State");
+                               
                                 newLine.BrokenCount++;
                                 points.CurrentLineType = newLine.LineType;
                                 points.NumberOfCandles = m - 1;
@@ -126,13 +122,13 @@ public class CandleService : ICandleService
                             }
 
                             newLine.LineType = LineType.SupportResistance;
-
-                            newLine.Price = mainCandle.OpenPrice;
+                            if (shouldAdd)
+                                newLine.Price = mainCandle.OpenPrice;
                             break;
                         }
                     }
                 }
-                else if (Math.Round(mainCandle.OpenPrice) == Math.Round(childCandle.ClosePrice))
+                else if (Math.Abs(Math.Round(mainCandle.OpenPrice) - Math.Round(childCandle.ClosePrice)) < 100)
                 {
                     newLine.Candles.Add(childCandle);
 
@@ -142,7 +138,7 @@ public class CandleService : ICandleService
                         newLine.IsBroken = newLine.LineType != null && newLine.LineType != LineType.SupportLine;
                         if (newLine.IsBroken)
                         {
-                            Console.WriteLine("Weird State");
+                           
                             newLine.BrokenCount++;
                             points.CurrentLineType = newLine.LineType;
                             points.NumberOfCandles = m - 1;
@@ -152,12 +148,13 @@ public class CandleService : ICandleService
                         }
 
                         newLine.LineType = LineType.SupportLine;
-                        newLine.Price = mainCandle.OpenPrice;
+                        if (shouldAdd)
+                            newLine.Price = mainCandle.OpenPrice;
                     }
 
                     points.CurrentLineType = newLine.LineType;
                 }
-                else if (Math.Round(mainCandle.ClosePrice) == Math.Round(childCandle.OpenPrice))
+                else if (Math.Abs(Math.Round(mainCandle.ClosePrice) - Math.Round(childCandle.OpenPrice)) < 100)
                 {
                     newLine.Candles.Add(childCandle);
 
@@ -167,7 +164,7 @@ public class CandleService : ICandleService
                         newLine.IsBroken = newLine.LineType != null && newLine.LineType != LineType.SupportLine;
                         if (newLine.IsBroken)
                         {
-                            Console.WriteLine("Weird State");
+                           
                             newLine.BrokenCount++;
                             points.CurrentLineType = newLine.LineType;
                             points.NumberOfCandles = m - 1;
@@ -177,12 +174,13 @@ public class CandleService : ICandleService
                         }
 
                         newLine.LineType = LineType.SupportLine;
-                        newLine.Price = mainCandle.ClosePrice;
+                        if (shouldAdd)
+                            newLine.Price = mainCandle.ClosePrice;
                     }
 
                     points.CurrentLineType = newLine.LineType;
                 }
-                else if (Math.Round(mainCandle.ClosePrice) == Math.Round(childCandle.ClosePrice))
+                else if (Math.Abs(Math.Round(mainCandle.ClosePrice) - Math.Round(childCandle.ClosePrice)) < 100)
                 {
                     newLine.Candles.Add(childCandle);
 
@@ -193,7 +191,7 @@ public class CandleService : ICandleService
                             newLine.IsBroken = newLine.LineType != null && newLine.LineType != LineType.SupportLine;
                             if (newLine.IsBroken)
                             {
-                                Console.WriteLine("Weird State");
+                               
                                 newLine.BrokenCount++;
                                 points.CurrentLineType = newLine.LineType;
                                 points.NumberOfCandles = m - 1;
@@ -221,7 +219,8 @@ public class CandleService : ICandleService
                             }
 
                             newLine.LineType = LineType.SupportResistance;
-                            newLine.Price = mainCandle.ClosePrice;
+                            if (shouldAdd)
+                                newLine.Price = mainCandle.ClosePrice;
                             break;
                         }
                     }
@@ -278,15 +277,17 @@ public class CandleService : ICandleService
                 continue;
 
             if (newLine.Price == 0) continue;
-            if (_lines.Count != 0)
+            if (Lines.Count != 0)
             {
                 var oldLine =
-                    _lines.SingleOrDefault(o => Math.Abs(Math.Round(newLine.Price) - Math.Round(o.Price)) < 120 && newLine.LineType==o.LineType);
+                    Lines.SingleOrDefault(o =>
+                        Math.Abs(Math.Round(newLine.Price) - Math.Round(o.Price)) < 150 &&
+                        newLine.LineType == o.LineType);
 
 
                 if (oldLine == null)
                 {
-                    _lines.Add(newLine);
+                    Lines.Add(newLine);
                 }
                 else
                 {
@@ -295,12 +296,12 @@ public class CandleService : ICandleService
             }
             else
             {
-                _lines.Add(newLine);
+                Lines.Add(newLine);
             }
         }
 
         CalculatePricesBetweenLineBreak();
-       // FilterDoubleLines();
+        // FilterDoubleLines();
     }
 
     public Candle? CreateCandleBasedOnNewData(string json)
@@ -342,9 +343,9 @@ public class CandleService : ICandleService
 
     private void CalculatePricesBetweenLineBreak()
     {
-        foreach (var line in _lines)
+        foreach (var line in Lines)
         {
-            var firstCandleIndex = _candles.IndexOf(line.Candles[0]);
+            var firstCandleIndex = Candles.IndexOf(line.Candles[0]);
             for (int i = 0; i < line.BreakDataList.Count; i++)
             {
                 var breakData = line.BreakDataList[i];
@@ -359,7 +360,7 @@ public class CandleService : ICandleService
     {
         for (int i = firstCandleIndex; i < breakData.NumberOfCandles; i++)
         {
-            var currentCandle = _candles[i];
+            var currentCandle = Candles[i];
             switch (breakData.CurrentLineType)
             {
                 case LineType.SupportLine when currentCandle.CandleType == CandleType.HighCandle:
@@ -385,14 +386,14 @@ public class CandleService : ICandleService
     private void FilterDoubleLines()
     {
         var lines = new HashSet<Line>();
-        Console.WriteLine(_lines.Count);
-        for (int i = 0; i < _lines.Count; i++)
+        Console.WriteLine(Lines.Count);
+        for (int i = 0; i < Lines.Count; i++)
         {
-            var line = _lines[i];
-            for (int j = i + 1; j < _lines.Count; j++)
+            var line = Lines[i];
+            for (int j = i + 1; j < Lines.Count; j++)
             {
                 bool shouldBreak = false;
-                var childLine = _lines[j];
+                var childLine = Lines[j];
 
 
                 if (Math.Abs(line.Price - childLine.Price) > 150)
@@ -406,7 +407,7 @@ public class CandleService : ICandleService
                         Console.WriteLine("IN");
                         if (line.Price < childLine.Price)
                         {
-                            _lines.RemoveAt(j);
+                            Lines.RemoveAt(j);
                             foreach (var childCandle in childLine.Candles)
                             {
                                 var alreadyAdded = line.Candles.Any(c => c == childCandle);
@@ -421,7 +422,7 @@ public class CandleService : ICandleService
                         }
                         else if (line.Price > childLine.Price)
                         {
-                            _lines.RemoveAt(i);
+                            Lines.RemoveAt(i);
                             foreach (var childCandle in line.Candles)
                             {
                                 var alreadyAdded = childLine.Candles.Any(c => c == childCandle);
@@ -442,6 +443,6 @@ public class CandleService : ICandleService
             }
         }
 
-        _lines = lines.ToList();
+        Lines = lines.ToList();
     }
 }

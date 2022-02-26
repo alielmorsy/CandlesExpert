@@ -30,7 +30,7 @@
                 .then(data => {
                     let candles = data['candles'];
                     let numberOfLines = data["lines"];
-                    var series = {};
+                    let series = {};
                     for (var i = 1; i <= numberOfLines; i++) {
                         dataTable.addColumn("number", "Line " + i);
                         series[i] = {type: 'line'}

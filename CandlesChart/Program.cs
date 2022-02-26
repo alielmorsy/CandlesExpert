@@ -16,7 +16,7 @@ using CandlesChart.services;
 
     var service = new CandleService();
     service.CreateCandlesFromOldData(result);
-    service.CreateLines();
+    service.Analyse();
 
     new WriteDataToStream(new FileStream("../../../candles.json", FileMode.Truncate, FileAccess.Write), service.Candles,
         service.Lines).WriteData();

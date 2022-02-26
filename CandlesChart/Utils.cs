@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using CandlesChart.models;
+using CandlesChart.models.enums;
 
 namespace CandlesChart;
 

@@ -16,7 +16,7 @@ public interface ICandleService
     /// </summary>
     
     /// <returns>Returns List Contains All Lines Found</returns>
-    void CreateLines();
+    void Analyse();
 
 
     /// <summary>

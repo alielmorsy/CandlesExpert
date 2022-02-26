@@ -1,4 +1,6 @@
-﻿namespace CandlesChart.models;
+﻿using CandlesChart.models.enums;
+
+namespace CandlesChart.models;
 
 public class BreakData
 {

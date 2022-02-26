@@ -1,4 +1,4 @@
-﻿namespace CandlesChart.models;
+﻿namespace CandlesChart.models.enums;
 
 public enum CandleType
 {

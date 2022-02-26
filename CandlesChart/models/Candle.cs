@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using CandlesChart.models.enums;
 
 namespace CandlesChart.models;
 
