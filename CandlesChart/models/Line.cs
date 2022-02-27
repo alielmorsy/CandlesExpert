@@ -19,6 +19,6 @@ public class Line
     public override string ToString()
     {
         return
-            $"Price: {Price}, Number Of Candles On It: {Candles.Count}, Line Type: {LineType}, Number Of Breaks :{BreakDataList.Count}";
+            $"Price: {Price}, Number Of Candles On It: {Candles.Count}, Line Type: {LineType}, Number Of Breaks : {BrokenCount}";
     }
 }

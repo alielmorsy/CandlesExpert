@@ -35,13 +35,23 @@
                         dataTable.addColumn("number", "Line " + i);
                         series[i] = {type: 'line'}
                     }
+                    
                     options['series'] = series;
                     candles.map(c => {
                         c[0] = new Date(c[0]);
                         dataTable.addRow(c);
                     });
 
-
+                    options['vAxis'] = {
+                        title: "Prices",
+                        viewWindowMode: 'explicit',
+                        viewWindow: {}
+                    };
+                    options['hAxis'] = {
+                        title: "Time Frame Each 4h",
+                        viewWindowMode: 'explicit',
+                        viewWindow: {}
+                    };
                     chart.draw(dataTable, options);
                 })
             // Don't fucking replace columns order pls <3

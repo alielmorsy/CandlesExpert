@@ -9,12 +9,11 @@ public interface ICandleService
     /// </summary>
     /// <param name="candleJson">A json text contains Data about </param>
     /// <returns>Return List Contains Candles list</returns>
- void CreateCandlesFromOldData(string candleJson);
+    void CreateCandlesFromOldData(string candleJson);
 
     /// <summary>
     /// TO Create List Contains the all lines are found between candles
     /// </summary>
-    
     /// <returns>Returns List Contains All Lines Found</returns>
     void Analyse();
 
@@ -25,4 +24,6 @@ public interface ICandleService
     /// <param name="json">The Candle Json</param>
     /// <returns>Return the new Candle</returns>
     Candle? CreateCandleBasedOnNewData(string json);
+
+    List<float> CalculateMovingAverage();
 }
